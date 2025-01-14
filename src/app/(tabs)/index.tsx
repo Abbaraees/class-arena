@@ -5,30 +5,21 @@ import { useRouter } from 'expo-router';
 import { Button, FAB, Modal, Portal, TextInput } from 'react-native-paper';
 import { MaterialIcons } from '@expo/vector-icons';
 import AddEntityModal from '~/src/components/AddEntityModal';
+import { useData } from '~/src/providers/DataProvider';
+import { Group } from '~/src/types';
  
-
-type Group = {
-  id: number;
-  name: string;
-  score: number;
-  members: number;
-}
 
 const HomeScreen = () => {
   const router = useRouter()
   const [isAdding, setIsAdding] = useState(false)
   const [groupName, setGroupName] = useState('')
-  const [groups, setGroups] = useState([
-    { id: 1, name: 'Group 1', score: 350, members: 4 },
-    { id: 2, name: 'Group 2', score: 300, members: 4 },
-    { id: 3, name: 'Group 3', score: 289, members: 4 },
-  ])
+  const { groups, addGroup, getMembersCount, getTotalScores } = useData()
 
   const renderGroup = ({ item }: {item: Group}) => (
     <TouchableOpacity className="bg-white p-4 rounded-lg shadow mb-4" onPress={() => handleGroupPress(item.id)}>
       <Text className="text-lg font-semibold text-gray-800">{item.name}</Text>
-      <Text className="text-sm text-gray-500">Total Score: {item.score}</Text>
-      <Text className="text-sm text-gray-500">Members: {item.members}</Text>
+      <Text className="text-sm text-gray-500">Total Score: {getTotalScores(item.id)}</Text>
+      <Text className="text-sm text-gray-500">Members: {getMembersCount(item.id)}</Text>
     </TouchableOpacity>
   );
 
@@ -38,9 +29,7 @@ const HomeScreen = () => {
   };
 
   const handleAddGroup = () => {
-    console.log('Add Group Pressed');
-    const newGroup = { id: groups.length + 1, name: groupName, score: 0, members: 0 }
-    setGroups([...groups, newGroup])
+    addGroup(groupName)
     setGroupName('')
     setIsAdding(false)
   };
@@ -52,12 +41,16 @@ const HomeScreen = () => {
 
   return (
     <View className="flex-1 bg-gray-100 px-4 py-6">
-      <FlatList
-        data={groups}
-        renderItem={renderGroup}
-        keyExtractor={(item) => item.id}
-        contentContainerStyle={{ paddingBottom: 100 }}
-      />
+      {groups.length > 0 
+      ?
+        <FlatList
+          data={groups}
+          renderItem={renderGroup}
+          keyExtractor={(item) => `${item.id}`}
+          contentContainerStyle={{ paddingBottom: 100 }}
+        />
+      : <Text className='text-lg text-purple-700 my-auto text-center'>No Group added yet, Add new group to get started!</Text>
+      }
       <FAB
         className="absolute bottom-2 right-2 bg-purple-600 rounded-full shadow-lg"
         onPress={() => setIsAdding(true)}

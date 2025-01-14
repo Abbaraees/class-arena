@@ -1,6 +1,6 @@
 import { View, Text } from 'react-native'
-import React from 'react'
-import { Modal, Portal, TextInput, Button } from 'react-native-paper'
+import React, { useState } from 'react'
+import { Modal, Portal, Button, TextInput} from 'react-native-paper'
 
 
 type AddEntityModalPropsType = {
@@ -12,6 +12,7 @@ type AddEntityModalPropsType = {
 }
 
 const AddEntityModal = ({title, entityName, onNameChange, handleAdd, handleCancel}: AddEntityModalPropsType) => {
+  const [name, setName] = useState('')
   return (
     <Portal>
       <Modal visible>
@@ -21,7 +22,7 @@ const AddEntityModal = ({title, entityName, onNameChange, handleAdd, handleCance
             placeholder={`Enter ${title} name`}
             label={`${title} Name`}
             mode='outlined'
-            value={entityName}
+            // value={name}
             onChangeText={onNameChange}
           />
           <Button
@@ -29,7 +30,7 @@ const AddEntityModal = ({title, entityName, onNameChange, handleAdd, handleCance
             onPress={handleAdd}
             className='mt-4'
           >
-            <Text>Add Group</Text>
+            <Text>Add {title}</Text>
           </Button>
           <Button
             mode='outlined'
