@@ -15,6 +15,8 @@ type DataContextType = {
   getGroup: (groupId: number) => Group | undefined,
   getMembersCount: (groupId: number) => number,
   getTotalScores: (groupId: number) => number,
+  currentGroup: Group | null,
+  setCurrentGroup: (group: Group | null) => void
 }
 
 const DataContext = createContext<DataContextType>({
@@ -29,8 +31,9 @@ const DataContext = createContext<DataContextType>({
   addScore: (groupId: number, score: number, subject: string) => {},
   getGroup: (groupId: number) => undefined,
   getMembersCount: (groupId: number) => 0,
-  getTotalScores: (groupId: number) => 0
-
+  getTotalScores: (groupId: number) => 0,
+  currentGroup: null,
+  setCurrentGroup: (group: Group | null) => {}
 })
 
 
@@ -40,6 +43,7 @@ export default function DataProvider({ children }: PropsWithChildren) {
   const [groups, setGroups] = useState<Group[]>([])
   const [leaderboard, setLeaderBoard] = useState([])
   const [scores, setScores] = useState<Score[]>([])
+  const [currentGroup, setCurrentGroup] = useState<Group|null>(null)
 
   const addGroup = (name: string) => {
     setGroups(prev => [...prev, {id: groups.length + 1, name, members: 0, score: 0}])
@@ -52,7 +56,7 @@ export default function DataProvider({ children }: PropsWithChildren) {
   }
 
   const addScore = (groupId: number, score: number, subject: string) => {
-    const newScore = {groupId, score, subject}
+    const newScore = {groupId, score, subject, id: scores.length + 1}
     setScores(prev => [...prev, newScore])
   }
   const getGroupMembers = (groupId: number) => {
@@ -82,7 +86,12 @@ export default function DataProvider({ children }: PropsWithChildren) {
   }
 
   return (
-    <DataContext.Provider value={{members, groups, leaderboard, scores, addGroup, addMember, addScore, getGroupMembers, getGroupScores, getGroup, getMembersCount, getTotalScores}}>
+    <DataContext.Provider value={{
+      members, groups, leaderboard, scores, 
+      addGroup, addMember, addScore, getGroupMembers, 
+      getGroupScores, getGroup, getMembersCount, getTotalScores,
+      currentGroup, setCurrentGroup
+    }}>
       {children}
     </DataContext.Provider>
   )

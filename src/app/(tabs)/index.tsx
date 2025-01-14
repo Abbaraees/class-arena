@@ -1,9 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, FlatList, TouchableOpacity } from 'react-native';
-import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { useRouter } from 'expo-router';
-import { Button, FAB, Modal, Portal, TextInput } from 'react-native-paper';
-import { MaterialIcons } from '@expo/vector-icons';
+import { FAB } from 'react-native-paper';
 import AddEntityModal from '~/src/components/AddEntityModal';
 import { useData } from '~/src/providers/DataProvider';
 import { Group } from '~/src/types';

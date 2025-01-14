@@ -19,13 +19,13 @@ const GroupDetails = () => {
   const [memberName, setMemberName] = useState('')
   const [members, setMembers] = useState<Member[]>([])
 
-  const { getGroup, addMember, getGroupMembers, members: membersDB } = useData()
+  const { getGroup, addMember, setCurrentGroup, members: membersDB } = useData()
 
   useEffect(() => {
     const group = getGroup(groupId)
     setGroup(group ? group : null)
     setMembers(group ? membersDB.filter(member => member.groupId === groupId) : [])
- 
+    setCurrentGroup(group ? group : null)
   }, [groupId, isAdding])
 
   
@@ -33,7 +33,7 @@ const GroupDetails = () => {
     <View className="bg-white p-2 rounded-xl shadow-md mb-4 flex flex-row gap-1 items-center" >
       <Avatar.Text label={item.name[0]} size={48}/>
       <Text className="text-lg font-semibold text-gray-800">{item.name}</Text>
-      <View className='ml-auto flex flex-row gap-4'>
+      {/* <View className='ml-auto flex flex-row gap-4'>
         <TouchableOpacity onPress={() => {}}>
           <MaterialCommunityIcons name='pencil' size={28} color={'darkgray'} />
         </TouchableOpacity>
@@ -41,7 +41,7 @@ const GroupDetails = () => {
         <TouchableOpacity onPress={() => {}}>
           <MaterialCommunityIcons name='delete-outline' size={28} color={'red'} />
         </TouchableOpacity>
-      </View>
+      </View> */}
     </View>
   );
 
