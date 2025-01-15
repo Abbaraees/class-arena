@@ -17,3 +17,9 @@ export type Score = {
   subject: string,
   score: number,
 }
+
+export type Leaderboard = {
+  groupName: string,
+  totalScore: number,
+  position: number
+}

@@ -1,11 +1,11 @@
 import { createContext, PropsWithChildren, useContext, useState } from "react";
-import { Group, Member, Score } from "../types";
+import { Group, Leaderboard, Member, Score } from "../types";
 
 
 type DataContextType = {
   members: Member[],
   groups: Group[],
-  leaderboard: any,
+  leaderboard: Leaderboard[],
   scores: Score[],
   addGroup: (name: string) => void,
   addMember: (name: string, groupId: number) => void,
@@ -16,7 +16,8 @@ type DataContextType = {
   getMembersCount: (groupId: number) => number,
   getTotalScores: (groupId: number) => number,
   currentGroup: Group | null,
-  setCurrentGroup: (group: Group | null) => void
+  setCurrentGroup: (group: Group | null) => void,
+  computeLeaderBoard: () => void,
 }
 
 const DataContext = createContext<DataContextType>({
@@ -33,7 +34,8 @@ const DataContext = createContext<DataContextType>({
   getMembersCount: (groupId: number) => 0,
   getTotalScores: (groupId: number) => 0,
   currentGroup: null,
-  setCurrentGroup: (group: Group | null) => {}
+  setCurrentGroup: (group: Group | null) => {},
+  computeLeaderBoard: () => {},
 })
 
 
@@ -41,7 +43,7 @@ export default function DataProvider({ children }: PropsWithChildren) {
 
   const [members, setMembers] = useState<Member[]>([])
   const [groups, setGroups] = useState<Group[]>([])
-  const [leaderboard, setLeaderBoard] = useState([])
+  const [leaderboard, setLeaderBoard] = useState<Leaderboard[]>([])
   const [scores, setScores] = useState<Score[]>([])
   const [currentGroup, setCurrentGroup] = useState<Group|null>(null)
 
@@ -85,12 +87,37 @@ export default function DataProvider({ children }: PropsWithChildren) {
       
   }
 
+  const computeLeaderBoard = () => {
+     // Step 1: Map groups to calculate total scores
+    let leaderBoard = groups.map(group => ({
+      groupName: group.name,
+      totalScore: getTotalScores(group.id),
+      position: 0 // Position will be calculated after sorting
+    }));
+
+    // Step 2: Sort the leaderboard by totalScore in descending order
+    leaderBoard = leaderBoard.sort((a, b) => b.totalScore - a.totalScore);
+
+    // Step 3: Assign positions considering ties
+    let currentRank = 1;
+    leaderBoard.forEach((group, index) => {
+      if (index > 0 && group.totalScore === leaderBoard[index - 1].totalScore) {
+        group.position = leaderBoard[index - 1].position; // Same position as the previous group
+      } else {
+        group.position = currentRank;
+      }
+      currentRank++;
+    });
+
+    setLeaderBoard(leaderBoard);
+  }
+
   return (
     <DataContext.Provider value={{
       members, groups, leaderboard, scores, 
       addGroup, addMember, addScore, getGroupMembers, 
       getGroupScores, getGroup, getMembersCount, getTotalScores,
-      currentGroup, setCurrentGroup
+      currentGroup, setCurrentGroup, computeLeaderBoard
     }}>
       {children}
     </DataContext.Provider>
