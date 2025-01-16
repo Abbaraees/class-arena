@@ -15,7 +15,7 @@ function DeleteEntityModal({ onAccept, onReject, entityName}: DeleteEntityModalP
       <Modal visible>
         <View className='w-3/4 mx-auto p-4 bg-white rounded-md'>
           <Text className='text-lg font-semibold text-center'>Are you sure you want to delete: {entityName}</Text>
-          <View className='flex flex-row justify-between '>
+          <View className='flex flex-row justify-between mt-4'>
             <Button 
               mode='contained'  
               className='w-1/3'

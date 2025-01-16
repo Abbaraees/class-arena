@@ -28,6 +28,8 @@ type DataContextType = {
   toggleDeletingGroup: (state: boolean) => void,
   deleteGroup: (groupId: number) => void,
   updateGroup: (groupId: number, name: string) => void,
+  updateMember: (memberId: number, name: string) => void,
+  deleteMember: (groupId: number) => void,
 }
 
 const DataContext = createContext<DataContextType>({
@@ -52,6 +54,8 @@ const DataContext = createContext<DataContextType>({
   toggleDeletingGroup: (state: boolean) => {},
   deleteGroup: (groupId: number) => {},
   updateGroup: (groupId: number, name: string) => {},
+  updateMember: (groupId: number, name: string) => {},
+  deleteMember: (groupId: number) => {}
 })
 
 const expo = SQLite.openDatabaseSync("classArena.db")
@@ -134,6 +138,24 @@ export default function DataProvider({ children }: PropsWithChildren) {
 
   }
 
+  const updateMember = async (memberId: number, name: string) => {
+    try {
+      await db.update(membersTable).set({name}).where(eq(membersTable.id, memberId))
+   } catch (error) {
+     console.log("Failed: ", error)
+   }
+   loadMembers()
+  }
+
+  const deleteMember = async (memberId?: number) => {
+    try {
+      memberId && await db.delete(membersTable).where(eq(membersTable.id, memberId))
+    } catch (error) {
+      console.log("Failed: ", error)
+    }
+    loadMembers()
+  }
+
   const addScore = async (groupId: number, score: number, subject: string) => {
     await db.insert(scoresTable).values({
       subject,
@@ -200,7 +222,8 @@ export default function DataProvider({ children }: PropsWithChildren) {
       getGroupScores, getGroup, getMembersCount, getTotalScores,
       currentGroup, setCurrentGroup, computeLeaderBoard,
       isDeletingGroup, isUpdatingGroup, toggleDeletingGroup, 
-      toggleUpdatingGroup, deleteGroup, updateGroup
+      toggleUpdatingGroup, deleteGroup, updateGroup, updateMember,
+      deleteMember
     }}>
       {children}
     </DataContext.Provider>

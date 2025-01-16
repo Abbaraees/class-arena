@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, FlatList, TouchableOpacity, Pressable } from 'react-native';
-import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
 import { ActivityIndicator, Avatar, Button, FAB, Modal, Portal } from 'react-native-paper';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
@@ -21,10 +20,17 @@ const GroupDetails = () => {
   const [members, setMembers] = useState<Member[]>([])
   const [groupName, setGroupName] = useState('')
 
+  const [isUpdatingMember, setIsUpdatingMember] = useState(false)
+  const [isDeletingMember, setIsDeletingMember] = useState(false)
+  const [activeMember, setActiveMember] = useState<Member>()
+
+
   const { 
     getGroup, addMember, setCurrentGroup, members: membersDB, 
     isDeletingGroup, isUpdatingGroup, toggleDeletingGroup, 
-    toggleUpdatingGroup, deleteGroup, updateGroup, currentGroup } = useData()
+    toggleUpdatingGroup, deleteGroup, updateGroup, currentGroup,
+    updateMember, deleteMember
+  } = useData()
 
   useEffect(() => {
     const group = getGroup(groupId)
@@ -35,23 +41,63 @@ const GroupDetails = () => {
 
   
   const renderMember = ({ item }: {item: Member}) => (
-    <View className="bg-white p-2 rounded-xl shadow-md mb-4 flex flex-row gap-1 items-center" >
+    <View className="bg-white p-3 rounded-xl shadow-md mb-4 flex flex-row gap-1 items-center" >
       <Avatar.Text label={item.name[0]} size={48}/>
       <Text className="text-lg font-semibold text-gray-800">{item.name}</Text>
-      {/* <View className='ml-auto flex flex-row gap-4'>
-        <TouchableOpacity onPress={() => {}}>
+      <View className='ml-auto flex flex-row gap-4'>
+        <TouchableOpacity onPress={() => {item.id && showUpdateMemberDialog(item.id)}}>
           <MaterialCommunityIcons name='pencil' size={28} color={'darkgray'} />
         </TouchableOpacity>
         
-        <TouchableOpacity onPress={() => {}}>
+        <TouchableOpacity onPress={() => {item.id && showDeleteMemberDialog(item.id)}}>
           <MaterialCommunityIcons name='delete-outline' size={28} color={'red'} />
         </TouchableOpacity>
-      </View> */}
+      </View>
     </View>
   );
 
+  const showUpdateMemberDialog = (memberId: number) => {
+    const activeMember = members.find(member => member.id == memberId)
+    setActiveMember(activeMember)
+    activeMember && setMemberName(activeMember?.name)
+    setIsUpdatingMember(true)
+  }
+
+  const hideUpdateMemberDialog = () => {
+    setActiveMember(undefined)
+    setIsUpdatingMember(false)
+    setMemberName('')
+  }
+
+  const handleUpdateMember = () => {
+    if (activeMember?.id) {
+      updateMember(activeMember.id, memberName)
+      setIsUpdatingMember(false)
+      setMemberName('')
+    }
+  }
+
+  const showDeleteMemberDialog = (memberId: number) => {
+    const activeMember = members.find(member => member.id == memberId)
+    setActiveMember(activeMember)
+    activeMember && setMemberName(activeMember?.name)
+    setIsDeletingMember(true)
+  }
+
+  const hideDeleteMemberDialog = () => {
+    setActiveMember(undefined)
+    setIsDeletingMember(false)
+    setMemberName('')
+  }
+
+  const handleDeleteMember = () => {
+    if (activeMember?.id) {
+      deleteMember(activeMember.id)
+      setIsDeletingMember(false)
+    }
+  }
+
   const handleAddMember = () => {
-    // Navigate to Add/Edit Competition Screen
     addMember(memberName, groupId)
     handleCancelAddMember()
 
@@ -136,6 +182,23 @@ const GroupDetails = () => {
               onAccept={handleDeleteGroup}
               onReject={() => toggleDeletingGroup(false)}
               entityName={group.name}
+            />
+          }
+          { isUpdatingMember &&
+            <AddEntityModal
+              title='Member'
+              handleCancel={hideUpdateMemberDialog}
+              handleAdd={handleUpdateMember}
+              onNameChange={setMemberName}
+              entityName={memberName}
+              isUpdate
+            />
+          }
+          { isDeletingMember && 
+            <DeleteEntityModal
+              onAccept={handleDeleteMember}
+              onReject={hideDeleteMemberDialog}
+              entityName={memberName}
             />
           }
         </View>
