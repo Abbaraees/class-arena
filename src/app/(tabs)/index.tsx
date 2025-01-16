@@ -59,7 +59,6 @@ const HomeScreen = () => {
       {isAdding && 
         <AddEntityModal 
           title='Group' 
-          entityName={groupName}
           onNameChange={setGroupName}
           handleAdd={handleAddGroup}
           handleCancel={handleCancelAddGroup}

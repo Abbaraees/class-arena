@@ -3,6 +3,7 @@ import { Group, Leaderboard, Member, Score } from "../types";
 import * as SQLite from "expo-sqlite"
 import { drizzle } from 'drizzle-orm/expo-sqlite';
 import { groups as groupsTable, scores as scoresTable, members as membersTable } from '../db/schema'
+import { eq } from "drizzle-orm";
 
 
 type DataContextType = {
@@ -21,6 +22,12 @@ type DataContextType = {
   currentGroup: Group | null,
   setCurrentGroup: (group: Group | null) => void,
   computeLeaderBoard: () => void,
+  isUpdatingGroup: boolean,
+  isDeletingGroup: boolean,
+  toggleUpdatingGroup: (state: boolean) => void,
+  toggleDeletingGroup: (state: boolean) => void,
+  deleteGroup: (groupId: number) => void,
+  updateGroup: (groupId: number, name: string) => void,
 }
 
 const DataContext = createContext<DataContextType>({
@@ -39,6 +46,12 @@ const DataContext = createContext<DataContextType>({
   currentGroup: null,
   setCurrentGroup: (group: Group | null) => {},
   computeLeaderBoard: () => {},
+  isUpdatingGroup: false,
+  isDeletingGroup: false,
+  toggleUpdatingGroup: (state: boolean) => {},
+  toggleDeletingGroup: (state: boolean) => {},
+  deleteGroup: (groupId: number) => {},
+  updateGroup: (groupId: number, name: string) => {},
 })
 
 const expo = SQLite.openDatabaseSync("classArena.db")
@@ -62,6 +75,8 @@ export default function DataProvider({ children }: PropsWithChildren) {
   const [leaderboard, setLeaderBoard] = useState<Leaderboard[]>([])
   const [scores, setScores] = useState<Score[]>([])
   const [currentGroup, setCurrentGroup] = useState<Group|null>(null)
+  const [isUpdatingGroup, toggleUpdatingGroup] = useState(false)
+  const [isDeletingGroup, toggleDeletingGroup] = useState(false)
 
   const loadGroups = async () => {
     const groups = await db.select().from(groupsTable)
@@ -87,6 +102,27 @@ export default function DataProvider({ children }: PropsWithChildren) {
       console.log("Failed: ", error)
     }
     loadGroups()
+  }
+
+
+  const deleteGroup = async (groupId?: number) => {
+    try {
+      groupId && await db.delete(groupsTable).where(eq(groupsTable.id, groupId))
+    } catch (error) {
+      console.log("Failed: ", error)
+    }
+    loadGroups()
+  }
+
+  const updateGroup = async (groupId: number, name: string) => {
+    try {
+       const updatedGroup = await db.update(groupsTable).set({name}).where(eq(groupsTable.id, groupId)).returning()
+       currentGroup && setCurrentGroup({...currentGroup, name: updatedGroup[0].name})
+    } catch (error) {
+      console.log("Failed: ", error)
+    }
+    loadGroups()
+    
   }
   
   const addMember = async (name: string, groupId: number) => {
@@ -162,7 +198,9 @@ export default function DataProvider({ children }: PropsWithChildren) {
       members, groups, leaderboard, scores, 
       addGroup, addMember, addScore, getGroupMembers, 
       getGroupScores, getGroup, getMembersCount, getTotalScores,
-      currentGroup, setCurrentGroup, computeLeaderBoard
+      currentGroup, setCurrentGroup, computeLeaderBoard,
+      isDeletingGroup, isUpdatingGroup, toggleDeletingGroup, 
+      toggleUpdatingGroup, deleteGroup, updateGroup
     }}>
       {children}
     </DataContext.Provider>

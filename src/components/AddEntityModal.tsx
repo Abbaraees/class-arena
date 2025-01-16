@@ -5,24 +5,24 @@ import { Modal, Portal, Button, TextInput} from 'react-native-paper'
 
 type AddEntityModalPropsType = {
   title: string,
-  entityName: string,
+  entityName?: string,
   onNameChange: (name: string) => void,
   handleAdd: () => void,
-  handleCancel: () => void
+  handleCancel: () => void,
+  isUpdate?: boolean
 }
 
-const AddEntityModal = ({title, entityName, onNameChange, handleAdd, handleCancel}: AddEntityModalPropsType) => {
-  const [name, setName] = useState('')
+const AddEntityModal = ({title, entityName, onNameChange, handleAdd, handleCancel, isUpdate}: AddEntityModalPropsType) => {
   return (
     <Portal>
       <Modal visible>
         <View className='w-100 bg-white rounded-md items-center, justify-center p-8 m-4'>
-          <Text className='text-xl font-bold mb-4'>{`Add New ${title}`}</Text>
+          <Text className='text-xl font-bold mb-4'>{`${isUpdate ? 'Update' : 'Add New'} ${title}`}</Text>
           <TextInput
             placeholder={`Enter ${title} name`}
             label={`${title} Name`}
             mode='outlined'
-            // value={name}
+            value={entityName}
             onChangeText={onNameChange}
           />
           <Button
@@ -30,7 +30,7 @@ const AddEntityModal = ({title, entityName, onNameChange, handleAdd, handleCance
             onPress={handleAdd}
             className='mt-4'
           >
-            <Text>Add {title}</Text>
+            <Text>{isUpdate ? 'Update' : 'Add'} {title}</Text>
           </Button>
           <Button
             mode='outlined'

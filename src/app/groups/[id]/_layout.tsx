@@ -4,8 +4,10 @@ import { TabBarIcon } from '@components/TabBarIcon';
 import { FontAwesome } from '@expo/vector-icons';
 import { TouchableOpacity } from 'react-native';
 import { View } from 'react-native';
+import { useData } from '~/src/providers/DataProvider';
 
 export default function TabLayout() {
+  const { toggleDeletingGroup, toggleUpdatingGroup } = useData()
   return (
     <Tabs
       screenOptions={{
@@ -18,11 +20,11 @@ export default function TabLayout() {
           tabBarIcon: ({ color }) => <TabBarIcon name="users" color={color} />,
           headerRight: () => (
             <View className='flex flex-row'>
-              <TouchableOpacity onPress={() => {}}>
+              <TouchableOpacity onPress={() => {toggleUpdatingGroup(true)}}>
                 <FontAwesome name='edit' size={24} color='#333' className='m-4'/>
               </TouchableOpacity>
 
-              <TouchableOpacity onPress={() => {}}>
+              <TouchableOpacity onPress={() => {toggleDeletingGroup(true)}}>
                 <FontAwesome name='trash-o' size={24} color='#ff1100' className='m-4'/>
               </TouchableOpacity>
             </View>

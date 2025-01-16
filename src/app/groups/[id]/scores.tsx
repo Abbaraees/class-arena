@@ -94,7 +94,7 @@ const Scores = () => {
               handleCancel={handleCancelAddScore}
               handleAdd={handleAddScore}
               onNameChange={setSubject}
-              onScoreChange={(score) => setScore(parseInt(score))}
+              onScoreChange={(score) => setScore(parseFloat(score))}
             />
           }
         </View>
