@@ -28,7 +28,7 @@ const Scores = () => {
     setGroup(group ? group : null)
     setScores(group ? scoredDB.filter(score => score.groupId === groupId) : [])
     setCurrentGroup(group ? group : null)
-  }, [groupId, isAdding])
+  }, [groupId, isAdding, scoredDB])
 
   
   const renderMember = ({ item }: {item: Score}) => (

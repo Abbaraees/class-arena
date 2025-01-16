@@ -26,7 +26,7 @@ const GroupDetails = () => {
     setGroup(group ? group : null)
     setMembers(group ? membersDB.filter(member => member.groupId === groupId) : [])
     setCurrentGroup(group ? group : null)
-  }, [groupId, isAdding])
+  }, [groupId, isAdding, membersDB])
 
   
   const renderMember = ({ item }: {item: Member}) => (

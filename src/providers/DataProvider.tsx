@@ -1,5 +1,8 @@
-import { createContext, PropsWithChildren, useContext, useState } from "react";
+import { createContext, PropsWithChildren, useContext, useEffect, useState } from "react";
 import { Group, Leaderboard, Member, Score } from "../types";
+import * as SQLite from "expo-sqlite"
+import { drizzle } from 'drizzle-orm/expo-sqlite';
+import { groups as groupsTable, scores as scoresTable, members as membersTable } from '../db/schema'
 
 
 type DataContextType = {
@@ -38,8 +41,21 @@ const DataContext = createContext<DataContextType>({
   computeLeaderBoard: () => {},
 })
 
+const expo = SQLite.openDatabaseSync("classArena.db")
+export const db = drizzle(expo)
+
 
 export default function DataProvider({ children }: PropsWithChildren) {
+
+  useEffect(() => {
+      initData()
+  }, [])
+
+  const initData = () => {
+    loadScores()
+    loadMembers()
+    loadGroups()
+  }
 
   const [members, setMembers] = useState<Member[]>([])
   const [groups, setGroups] = useState<Group[]>([])
@@ -47,19 +63,48 @@ export default function DataProvider({ children }: PropsWithChildren) {
   const [scores, setScores] = useState<Score[]>([])
   const [currentGroup, setCurrentGroup] = useState<Group|null>(null)
 
-  const addGroup = (name: string) => {
-    setGroups(prev => [...prev, {id: groups.length + 1, name, members: 0, score: 0}])
+  const loadGroups = async () => {
+    const groups = await db.select().from(groupsTable)
+    const groupsFormated: Group[] = groups?.map(group => (
+      {...group, score: getTotalScores(group.id), members: getMembersCount(group.id)}
+    ))
+    setGroups(groupsFormated)
+  }
+  const loadMembers = async () => {
+    const members = await db.select().from(membersTable)
+    setMembers(members)
+  }
+  const loadScores = async () => {
+    const scores = await db.select().from(scoresTable)
+    setScores(scores)
+  }
+
+  const addGroup = async (name: string) => {
+    try {
+      await db.insert(groupsTable).values({name})
+      console.log("Added")
+    } catch (error) {
+      console.log("Failed: ", error)
+    }
+    loadGroups()
   }
   
-  const addMember = (name: string, groupId: number) => {
-    const newMember: Member = {id: members.length + 1, name, groupId}
-    setMembers(prev => [...prev, newMember])
+  const addMember = async (name: string, groupId: number) => {
+    await db.insert(membersTable).values({
+      name,
+      groupId
+    })
+    loadMembers()
 
   }
 
-  const addScore = (groupId: number, score: number, subject: string) => {
-    const newScore = {groupId, score, subject, id: scores.length + 1}
-    setScores(prev => [...prev, newScore])
+  const addScore = async (groupId: number, score: number, subject: string) => {
+    await db.insert(scoresTable).values({
+      subject,
+      groupId,
+      score
+    })
+    loadScores()
   }
   const getGroupMembers = (groupId: number) => {
     return members.filter(member => member.groupId == groupId)
