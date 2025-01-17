@@ -10,7 +10,7 @@ export default function Home() {
   const {leaderboard, computeLeaderBoard, scores, groups} = useData()
   const renderPosition = ({ item }: {item: Leaderboard}) => {
     return (
-      <View className='w-full flex flex-row items-center gap-2 bg-white p-4 rounded-lg shadow mb-3'>
+      <View className={`w-full flex flex-row items-center gap-2 ${item.totalScore >= 40 ?`bg-white` : 'bg-red-400'} p-4 rounded-lg shadow mb-3 border-gray-300 border`}>
         <Avatar.Text label={`${item.position}`} size={48}/>
         <View>
           <Text className='text-lg'>
