@@ -10,7 +10,7 @@ type AddScoreModalPropsType = {
   handleCancel: () => void,
   isUpdate?: boolean,
   subject?: string,
-  score?: number
+  score?: string
 }
 
 const AddScoreModal = ({onNameChange, handleAdd, handleCancel, onScoreChange, isUpdate, subject, score}: AddScoreModalPropsType) => {
@@ -26,16 +26,26 @@ const AddScoreModal = ({onNameChange, handleAdd, handleCancel, onScoreChange, is
             value={subject}
             onChangeText={onNameChange}
           />
-          <TextInput
-            value={score ? `${score}` : ''}
-            placeholder={`Enter Score`}
-            label={`Score`}
-            mode='outlined'
-            // value={name}
-            onChangeText={onScoreChange}
-            keyboardType='numeric'
-            style={{marginTop: 8}}
-          />
+          { score ? 
+            <TextInput
+              value={score}
+              placeholder={`Enter Score`}
+              label={`Score`}
+              mode='outlined'
+              onChangeText={onScoreChange}
+              keyboardType='numeric'
+              style={{marginTop: 8}}
+            />
+          :
+            <TextInput
+              placeholder={`Enter Score`}
+              label={`Score`}
+              mode='outlined'
+              onChangeText={onScoreChange}
+              keyboardType='numeric'
+              style={{marginTop: 8}}
+            />
+          }
           <Button
             mode='contained'
             onPress={handleAdd}

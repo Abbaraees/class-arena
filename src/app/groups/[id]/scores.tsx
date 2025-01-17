@@ -19,7 +19,7 @@ const Scores = () => {
   const [group, setGroup] = useState<Group|null>()
   const [isAdding, setIsAdding] = useState(false)
   const [subject, setSubject] = useState('')
-  const [score, setScore] = useState(0)
+  const [score, setScore] = useState('')
   const [scores, setScores] = useState<Score[]>([])
   const [activeScore, setActiveScore] = useState<Score>()
   const [isUpdatingScore, setIsUpdatingScore] = useState(false)
@@ -62,7 +62,7 @@ const Scores = () => {
 
   const handleAddScore = () => {
     // Navigate to Add/Edit Competition Screen
-    addScore(groupId, score, subject)
+    addScore(groupId, parseFloat(score), subject)
     handleCancelAddScore()
 
   };
@@ -70,7 +70,7 @@ const Scores = () => {
   const handleCancelAddScore = () => {
     setIsAdding(false)
     setSubject('')
-    setScore(0)
+    setScore('')
   }
 
   const showUpdateScoreDialog = async (scoreId: number) => {
@@ -79,7 +79,7 @@ const Scores = () => {
       setActiveScore(activeScore)
       setIsUpdatingScore(true)
       setSubject(activeScore.subject)
-      setScore(activeScore.score)
+      setScore(`${activeScore.score}`)
     }
   }
 
@@ -92,10 +92,10 @@ const Scores = () => {
 
   const handleUpdateScore = async () => {
     if (activeScore && activeScore.id) {
-      updateScore(activeScore.id, subject, score)
+      updateScore(activeScore.id, subject, parseFloat(score))
       setIsUpdatingScore(false)
       setSubject('')
-      setScore(0)
+      setScore('')
     }
   }
 
@@ -119,7 +119,7 @@ const Scores = () => {
       deleteScore(activeScore.id)
       setIsDeletingScore(false)
       setSubject('')
-      setScore(0)
+      setScore('')
     }
   }
 
@@ -160,7 +160,7 @@ const Scores = () => {
               handleCancel={handleCancelAddScore}
               handleAdd={handleAddScore}
               onNameChange={setSubject}
-              onScoreChange={(score) => setScore(parseFloat(score))}
+              onScoreChange={setScore}
             />
           }
           {isUpdatingScore && 
@@ -168,7 +168,7 @@ const Scores = () => {
               handleCancel={hideUpdateScoreDialog}
               handleAdd={handleUpdateScore}
               onNameChange={setSubject}
-              onScoreChange={(score) => setScore(parseFloat(score))}
+              onScoreChange={setScore}
               subject={subject}
               score={score}
               isUpdate
