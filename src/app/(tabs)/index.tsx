@@ -17,9 +17,9 @@ const HomeScreen = () => {
 
   const renderGroup = ({ item }: {item: Group}) => (
     <TouchableOpacity className="bg-white p-4 rounded-lg shadow mb-4" onPress={() => handleGroupPress(item.id)}>
-      <Text className="text-lg font-semibold text-gray-800">{item.name}</Text>
-      <Text className="text-sm text-gray-500">Total Score: {getTotalScores(item.id)}</Text>
-      <Text className="text-sm text-gray-500">Members: {getMembersCount(item.id)}</Text>
+      <Text className="text-xl font-semibold text-gray-900">{item.name}</Text>
+      <Text className="text-lg text-gray-600">Total Score: {getTotalScores(item.id)}</Text>
+      <Text className="text-lg text-gray-600">Members: {getMembersCount(item.id)}</Text>
     </TouchableOpacity>
   );
 
