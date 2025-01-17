@@ -7,24 +7,27 @@ type AddScoreModalPropsType = {
   onNameChange: (name: string) => void,
   onScoreChange: (score: string) => void,
   handleAdd: () => void,
-  handleCancel: () => void
+  handleCancel: () => void,
+  isUpdate?: boolean,
+  subject?: string,
+  score?: number
 }
 
-const AddScoreModal = ({onNameChange, handleAdd, handleCancel, onScoreChange}: AddScoreModalPropsType) => {
-  const [name, setName] = useState('')
+const AddScoreModal = ({onNameChange, handleAdd, handleCancel, onScoreChange, isUpdate, subject, score}: AddScoreModalPropsType) => {
   return (
     <Portal>
       <Modal visible>
         <View className='w-100 bg-white rounded-md items-center, justify-center p-8 m-4'>
-          <Text className='text-xl font-bold mb-4'>{`Add New Score`}</Text>
+          <Text className='text-xl font-bold mb-4'>{isUpdate ? 'Update Score' : `Add New Score`}</Text>
           <TextInput
             placeholder={`Enter subject name`}
             label={`Subject Name`}
             mode='outlined'
-            // value={name}
+            value={subject}
             onChangeText={onNameChange}
           />
           <TextInput
+            value={score ? `${score}` : ''}
             placeholder={`Enter Score`}
             label={`Score`}
             mode='outlined'
@@ -38,7 +41,7 @@ const AddScoreModal = ({onNameChange, handleAdd, handleCancel, onScoreChange}: A
             onPress={handleAdd}
             className='mt-4'
           >
-            <Text>Add Score</Text>
+            <Text>{isUpdate ? 'Update Score' : 'Add Score'}</Text>
           </Button>
           <Button
             mode='outlined'

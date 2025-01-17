@@ -8,6 +8,7 @@ import AddEntityModal from '~/src/components/AddEntityModal';
 import { Group, Member, Score } from '~/src/types';
 import { useData } from '~/src/providers/DataProvider';
 import AddScoreModal from '~/src/components/AddScoreModal';
+import DeleteEntityModal from '~/src/components/DeleteEntityModal';
 
 
 const Scores = () => {
@@ -20,8 +21,12 @@ const Scores = () => {
   const [subject, setSubject] = useState('')
   const [score, setScore] = useState(0)
   const [scores, setScores] = useState<Score[]>([])
+  const [activeScore, setActiveScore] = useState<Score>()
+  const [isUpdatingScore, setIsUpdatingScore] = useState(false)
+  const [isDeletingScore, setIsDeletingScore] = useState(false)
 
-  const { getGroup, addScore, setCurrentGroup, scores: scoredDB } = useData()
+  const { getGroup, addScore, setCurrentGroup, scores: scoredDB,
+    updateScore, deleteScore } = useData()
 
   useEffect(() => {
     const group = getGroup(groupId)
@@ -32,9 +37,20 @@ const Scores = () => {
 
   
   const renderMember = ({ item }: {item: Score}) => (
-    <View className="bg-white p-2 rounded-xl shadow-md mb-4 gap-1" >
-      <Text className="text-2xl font-semibold text-gray-800">{item.subject}</Text>
-      <Text className="text-2xl text-gray-600">{item.score}</Text>
+    <View className="bg-white p-4 rounded-xl shadow-md mb-4 gap-1 flex flex-row" >
+      <View>
+        <Text className="text-2xl font-semibold text-gray-800">{item.subject}</Text>
+        <Text className="text-2xl text-gray-600">{item.score}</Text>
+      </View>
+      <View className='ml-auto flex flex-row gap-4 items-center'>
+        <TouchableOpacity onPress={() => {item.id && showUpdateScoreDialog(item.id)}}>
+          <MaterialCommunityIcons name='pencil' size={28} color={'darkgray'} />
+        </TouchableOpacity>
+        
+        <TouchableOpacity onPress={() => {item.id && showDeleteScoreDialog(item.id)}}>
+          <MaterialCommunityIcons name='delete-outline' size={28} color={'red'} />
+        </TouchableOpacity>
+      </View>
     </View>
   );
 
@@ -55,6 +71,56 @@ const Scores = () => {
     setIsAdding(false)
     setSubject('')
     setScore(0)
+  }
+
+  const showUpdateScoreDialog = async (scoreId: number) => {
+    const activeScore = scores.find(score => score.id == scoreId)
+    if (activeScore) {
+      setActiveScore(activeScore)
+      setIsUpdatingScore(true)
+      setSubject(activeScore.subject)
+      setScore(activeScore.score)
+    }
+  }
+
+  const hideUpdateScoreDialog = async () => {
+    if (isUpdatingScore) {
+      setActiveScore(undefined)
+      setIsUpdatingScore(false)
+    }
+  }
+
+  const handleUpdateScore = async () => {
+    if (activeScore && activeScore.id) {
+      updateScore(activeScore.id, subject, score)
+      setIsUpdatingScore(false)
+      setSubject('')
+      setScore(0)
+    }
+  }
+
+  const showDeleteScoreDialog = async (scoreId: number) => {
+    const activeScore = scores.find(score => score.id == scoreId)
+    if (activeScore) {
+      setActiveScore(activeScore)
+      setIsDeletingScore(true)
+    }
+  }
+
+  const hideDeleteScoreDialog = async () => {
+    if (isDeletingScore) {
+      setActiveScore(undefined)
+      setIsDeletingScore(false)
+    }
+  }
+
+  const handleDeleteScore = async () => {
+    if (activeScore && activeScore.id) {
+      deleteScore(activeScore.id)
+      setIsDeletingScore(false)
+      setSubject('')
+      setScore(0)
+    }
   }
 
   return (
@@ -95,6 +161,24 @@ const Scores = () => {
               handleAdd={handleAddScore}
               onNameChange={setSubject}
               onScoreChange={(score) => setScore(parseFloat(score))}
+            />
+          }
+          {isUpdatingScore && 
+            <AddScoreModal
+              handleCancel={hideUpdateScoreDialog}
+              handleAdd={handleUpdateScore}
+              onNameChange={setSubject}
+              onScoreChange={(score) => setScore(parseFloat(score))}
+              subject={subject}
+              score={score}
+              isUpdate
+            />
+          }
+          {isDeletingScore && 
+            <DeleteEntityModal
+              onAccept={handleDeleteScore}
+              onReject={hideDeleteScoreDialog}
+              entityName={activeScore?.subject ?? ''}
             />
           }
         </View>
