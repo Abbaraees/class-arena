@@ -18,6 +18,7 @@ export default function RootLayout() {
   }
   else {
     console.log("Migration failed")
+    console.log(error)
   }
 
   return (

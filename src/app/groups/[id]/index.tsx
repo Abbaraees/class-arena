@@ -23,6 +23,7 @@ const GroupDetails = () => {
   const [isUpdatingMember, setIsUpdatingMember] = useState(false)
   const [isDeletingMember, setIsDeletingMember] = useState(false)
   const [activeMember, setActiveMember] = useState<Member>()
+  const [warningChecked, setWarningChecked] = useState(false)
 
 
   const { 
@@ -41,12 +42,12 @@ const GroupDetails = () => {
 
   
   const renderMember = ({ item }: {item: Member}) => (
-    <View className="bg-white p-3 rounded-xl shadow-md mb-4 flex flex-row gap-1 items-center" >
+    <View className={`${ item.warning ? 'bg-red-300' : 'bg-white'} p-3 rounded-xl shadow-md mb-4 flex flex-row gap-1 items-center`} >
       <Avatar.Text label={item.name[0]} size={48}/>
       <Text className="text-lg font-semibold text-gray-800">{item.name}</Text>
       <View className='ml-auto flex flex-row gap-4'>
         <TouchableOpacity onPress={() => {item.id && showUpdateMemberDialog(item.id)}}>
-          <MaterialCommunityIcons name='pencil' size={28} color={'darkgray'} />
+          <MaterialCommunityIcons name='pencil' size={28} color={'#3e3e3e'} />
         </TouchableOpacity>
         
         <TouchableOpacity onPress={() => {item.id && showDeleteMemberDialog(item.id)}}>
@@ -58,8 +59,11 @@ const GroupDetails = () => {
 
   const showUpdateMemberDialog = (memberId: number) => {
     const activeMember = members.find(member => member.id == memberId)
-    setActiveMember(activeMember)
-    activeMember && setMemberName(activeMember?.name)
+    if (activeMember) {
+      setActiveMember(activeMember)
+      setMemberName(activeMember?.name)
+      setWarningChecked(activeMember.warning)
+    }
     setIsUpdatingMember(true)
   }
 
@@ -71,7 +75,7 @@ const GroupDetails = () => {
 
   const handleUpdateMember = () => {
     if (activeMember?.id) {
-      updateMember(activeMember.id, memberName)
+      updateMember(activeMember.id, memberName, warningChecked)
       setIsUpdatingMember(false)
       setMemberName('')
     }
@@ -191,6 +195,8 @@ const GroupDetails = () => {
               handleAdd={handleUpdateMember}
               onNameChange={setMemberName}
               entityName={memberName}
+              warningChecked={warningChecked}
+              toggleWarning={() => {setWarningChecked(prev => !prev)}}
               isUpdate
             />
           }

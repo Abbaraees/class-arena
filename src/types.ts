@@ -8,7 +8,8 @@ export type Group = {
 export type Member = {
   id?: number,
   groupId: number,
-  name: string
+  name: string,
+  warning: boolean
 }
 
 export type Score = {

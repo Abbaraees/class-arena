@@ -1,4 +1,4 @@
-import { int, sqliteTable, text, real } from "drizzle-orm/sqlite-core";
+import { int, sqliteTable, text, real, integer } from "drizzle-orm/sqlite-core";
 
 export const groups = sqliteTable("groups", {
   id: int().primaryKey({autoIncrement: true}),
@@ -8,6 +8,7 @@ export const groups = sqliteTable("groups", {
 export const members = sqliteTable("members", {
   id: int().primaryKey({autoIncrement: true}),
   name: text().notNull(),
+  warning: integer({mode: 'boolean'}).notNull(),
   groupId: int().references(() => groups.id, {onDelete: 'cascade'}).notNull()
 })
 

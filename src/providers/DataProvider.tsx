@@ -28,7 +28,7 @@ type DataContextType = {
   toggleDeletingGroup: (state: boolean) => void,
   deleteGroup: (groupId: number) => void,
   updateGroup: (groupId: number, name: string) => void,
-  updateMember: (memberId: number, name: string) => void,
+  updateMember: (memberId: number, name: string, warning: boolean) => void,
   deleteMember: (groupId: number) => void,
   updateScore: (scoreId: number, subject: string, score: number) => void,
   deleteScore: (scoreId: number) => void,
@@ -56,7 +56,7 @@ const DataContext = createContext<DataContextType>({
   toggleDeletingGroup: (state: boolean) => {},
   deleteGroup: (groupId: number) => {},
   updateGroup: (groupId: number, name: string) => {},
-  updateMember: (groupId: number, name: string) => {},
+  updateMember: (groupId: number, name: string, warning: boolean) => {},
   deleteMember: (groupId: number) => {},
   updateScore: (scoreId: number, subject: string, score: number) => {},
   deleteScore: (scoreId: number) => {},
@@ -136,15 +136,16 @@ export default function DataProvider({ children }: PropsWithChildren) {
   const addMember = async (name: string, groupId: number) => {
     await db.insert(membersTable).values({
       name,
-      groupId
+      groupId,
+      warning: false
     })
     loadMembers()
 
   }
 
-  const updateMember = async (memberId: number, name: string) => {
+  const updateMember = async (memberId: number, name: string, warning?: boolean) => {
     try {
-      await db.update(membersTable).set({name}).where(eq(membersTable.id, memberId))
+      await db.update(membersTable).set({name, warning}).where(eq(membersTable.id, memberId))
    } catch (error) {
      console.log("Failed: ", error)
    }

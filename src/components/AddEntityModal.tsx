@@ -1,6 +1,6 @@
-import { View, Text } from 'react-native'
+import { View, Text, Pressable } from 'react-native'
 import React, { useState } from 'react'
-import { Modal, Portal, Button, TextInput} from 'react-native-paper'
+import { Modal, Portal, Button, TextInput, Checkbox} from 'react-native-paper'
 
 
 type AddEntityModalPropsType = {
@@ -9,10 +9,12 @@ type AddEntityModalPropsType = {
   onNameChange: (name: string) => void,
   handleAdd: () => void,
   handleCancel: () => void,
-  isUpdate?: boolean
+  isUpdate?: boolean,
+  warningChecked?: boolean,
+  toggleWarning?: () => void
 }
 
-const AddEntityModal = ({title, entityName, onNameChange, handleAdd, handleCancel, isUpdate}: AddEntityModalPropsType) => {
+const AddEntityModal = ({title, entityName, onNameChange, handleAdd, handleCancel, isUpdate, warningChecked, toggleWarning}: AddEntityModalPropsType) => {
   return (
     <Portal>
       <Modal visible>
@@ -25,6 +27,12 @@ const AddEntityModal = ({title, entityName, onNameChange, handleAdd, handleCance
             value={entityName}
             onChangeText={onNameChange}
           />
+         { isUpdate && 
+          <Pressable className='flex flex-row items-center' onPress={toggleWarning}>
+            <Checkbox status={warningChecked ? 'checked' : 'unchecked'} />
+            <Text className='text-md font-semibold'>Flag Warning</Text>
+          </Pressable>
+          }
           <Button
             mode='contained'
             onPress={handleAdd}
